@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Calculator</title>
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            margin: 0px;
+            background-color: black;
+            /* height:max-content; */
+        }
+
+        .layoutContainer{
+            display: flex;
+            flex-direction: column;
+            width: 85%;
+            max-width: 85em;
+            background-color: rgb(164, 16, 16);
+            height: 100%;
+
+/* background: rgb(0,0,0);
+background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(105,6,6,1) 9%, rgba(207,15,15,1) 21%, rgba(207,15,15,1) 49%, rgba(207,15,15,1) 78%, rgba(69,6,6,1) 95%, rgba(0,0,0,1) 100%); */
+
+            color: #fff;
+            padding: min(3vw, 3em);
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .layoutContainer h1{
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: min(4vw, 4em);
+            text-decoration: underline;
+        }
+
+        .buttonContainer{
+            display: flex;
+        }
+
+        .buttonContainer button{
+            font-size: min(1.4vw, 1.4em);
+            padding-left: min(4vw, 4em);
+            padding-right: min(4vw, 4em);
+            padding-top: min(1.2vw, 1.2em);
+            padding-bottom: min(1.2vw, 1.2em);
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            cursor: pointer;
+            border: none;
+            border-radius: min(0.3vw, 0.3em);
+            transition: 0.12s ease-in-out;
+            border: 1px solid rgb(164, 16, 16);
+        }
+
+        @media only screen and (max-width: 767px) {
+            .buttonContainer button{
+            font-size: min(4vw, 4em);
+            }
+        }
+
+        .layoutContainer button:hover{
+            opacity: 0.8;
+            background-color: rgb(164, 16, 16);
+            color: #fff;
+            border: 1px solid #fff;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+
+        input {
+            display: block;
+            margin: 10px 0;
+            width: min(10vw, 10em);
+            padding: min(0.35vw, 0.35em);
+        }
+
+        .workContainer{
+            border-top: 1px solid #fff;
+            border-bottom: 1px solid #fff;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .life-visualization {
+            display: flex;
+            width: 100%;
+            height: 50px;
+            margin-top: 20px;
+        }
+        .life-segment {
+            height: 100%;
+        }
+        .dormir {
+            background-color: rgb(51, 187, 232);
+        }
+        .trabajo {
+            background-color: rgb(77, 222, 77);
+        }
+        .comodin {
+            background-color: rgb(221, 117, 14);
+        }
+        .libre {
+            background-color: #fff;
+        }
+        .legend {
+            margin-top: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layoutContainer">
+
+        <h1>Life calculator</h1>
+
+        <label for="expectativa">Expectativa de vida (o edad actual)</label>
+        <input type="number" id="expectativa" value="70" min="1">
+
+        <label for="horasDormir">¿Cuántas horas dormís al día (en promedio)?</label>
+        <input type="number" id="horasDormir" value="8" min="0" max="24">
+
+
+        <div class="workContainer">
+            <label for="yearsOfWork">¿Cuántos años trabajarás en tu vida (aproximado)?</label>
+            <input type="number" id="yearsOfWork" value="40" min="0">
+
+            <label for="horasTrabajo">¿Cuántas horas trabajas al día (en promedio)?</label>
+            <input type="number" id="horasTrabajo" value="8" min="0" max="24">
+
+            <label for="semanasVacaciones">¿Cuántas semanas de vacaciones tenes al año?</label>
+            <input type="number" id="semanasVacaciones" value="4" min="0" max="52">
+
+        </div>
+
+
+        <label for="yearsComodin">¿Cuántos años dedicaste o dedicarás a tus estudios secundarios, universitarios etc?</label>
+        <input type="number" id="yearsComodin" value="0" min="0">
+
+        <label for="horasComodin">¿Cuántas horas por día dedicaste o dedicarás a los estudios?</label>
+        <input type="number" id="horasComodin" value="0" min="0" max="24">
+
+
+        <div class="buttonContainer">
+          <button onclick="calcularVidaConsciente()">Calcular</button>
+        </div>
+
+
+        <div class="result" id="resultado"></div>
+        <div class="result" id="resultadoTrabajo"></div>
+        <div class="result" id="resultadoComodin"></div>
+        <div class="result" id="resultadoTiempoLibre"></div>
+
+        <div class="life-visualization" id="lifeVisualization"></div>
+
+        <div class="legend" id="legend"></div>
+
+
+    </div>
+
+
+
+    <script>
+
+        // Qué haces perdiendo tiempo de tu valiosa vida husmeando en el código de una página mal hecha?
+        // Ve, haz algo productivo. Capaz yo también debería... jaja
+
+        function calcularVidaConsciente() {
+            const expectativaVida = parseInt(document.getElementById('expectativa').value);
+            const horasPorDiaDormir = parseInt(document.getElementById('horasDormir').value);
+            const yearsOfWork = parseInt(document.getElementById('yearsOfWork').value);
+            const horasPorDiaTrabajo = parseInt(document.getElementById('horasTrabajo').value);
+            const semanasVacaciones = parseInt(document.getElementById('semanasVacaciones').value);
+            const yearsComodin = parseInt(document.getElementById('yearsComodin').value);
+            const horasPorDiaComodin = parseInt(document.getElementById('horasComodin').value);
+
+            if (isNaN(expectativaVida) || isNaN(horasPorDiaDormir) || isNaN(yearsOfWork) || isNaN(horasPorDiaTrabajo) || isNaN(semanasVacaciones) || isNaN(yearsComodin) || isNaN(horasPorDiaComodin)) {
+                document.getElementById('resultado').innerHTML = "Por favor, ingrese valores válidos.";
+                return;
+            }
+
+            //sueño
+            const daysPerYear = 365;
+            const hoursPerYearSleep = horasPorDiaDormir * daysPerYear;
+            const yearsSleepying = hoursPerYearSleep * expectativaVida / 24 / daysPerYear;
+            const consciousYears = expectativaVida - yearsSleepying;
+            const porcentajeDormido = (yearsSleepying / expectativaVida) * 100;
+
+            //  trabajo
+            const laboralDaysPerYear = daysPerYear - (semanasVacaciones * 7); 
+            const hoursPerYearWork = horasPorDiaTrabajo * laboralDaysPerYear;
+            const yearsWorking = hoursPerYearWork * yearsOfWork / 24 / daysPerYear;
+
+            // estudios
+            let comodinTotalYears = 0;
+            let porcentajeComodinConsciente = 0;
+            if (yearsComodin > 0 && horasPorDiaComodin > 0) {
+                const hoursPerYearComodin = horasPorDiaComodin * daysPerYear;
+                comodinTotalYears = hoursPerYearComodin * yearsComodin / 24 / daysPerYear;
+                porcentajeComodinConsciente = (comodinTotalYears / consciousYears) * 100;
+            }
+
+            // Porcentajes de tiempo trabajado
+            const porcentajeTrabajadoVida = (yearsWorking / expectativaVida) * 100;
+            const porcentajeTrabajadoConsciente = (yearsWorking / consciousYears) * 100;
+
+            // tiempo libre
+            const ocupedYears = yearsSleepying + yearsWorking + comodinTotalYears;
+            const yearsOfFreeTime = expectativaVida - ocupedYears;
+            const porcentajeTiempoLibre = (yearsOfFreeTime / expectativaVida) * 100;
+
+            // Mostrar resultados generales
+            document.getElementById('resultado').innerHTML = `
+                En tus ${expectativaVida} años de vida:
+                <br>- Estuviste o estarás aproximadamente ${yearsSleepying.toFixed(2)} años dormido (${porcentajeDormido.toFixed(2)}% de tu vida)
+                y consciente solamente por ${consciousYears.toFixed(2)} años.
+            `;
+
+            document.getElementById('resultadoTrabajo').innerHTML = `
+               - Trabajaste o trabajarás aproximadamente ${yearsWorking.toFixed(2)} años.
+                 Eso es un ${porcentajeTrabajadoVida.toFixed(2)}% de toda tu vida y un 
+                 ${porcentajeTrabajadoConsciente.toFixed(2)}% del tiempo que estás consciente y no dedicas tu tiempo a dormir.
+            `;
+
+            if (comodinTotalYears > 0) {
+                document.getElementById('resultadoComodin').innerHTML = `
+                    - Dedicarás aproximadamente ${comodinTotalYears.toFixed(2)} años a los estudios. 
+                    Eso es un ${porcentajeComodinConsciente.toFixed(2)}% del tiempo que sos consciente y no estás durmiendo.
+                `;
+            } else {
+                document.getElementById('resultadoComodin').innerHTML = "";
+            }
+
+            document.getElementById('resultadoTiempoLibre').innerHTML = `
+                - De tus ${expectativaVida} años de vida te quedarán ${yearsOfFreeTime.toFixed(2)} años de tiempo libre.
+                <br>Eso es un ${porcentajeTiempoLibre.toFixed(2)}% de tu vida total.
+
+                 Mientras que en los ${(expectativaVida - yearsOfFreeTime).toFixed(2)} años restantes,
+                 un ${((expectativaVida - yearsOfFreeTime.toFixed(2)) / expectativaVida * 100).toFixed(2)}% estarás durmiendo,
+                trabajando, estudiando o realizando otras tareas. 
+
+                
+            `;
+
+            const lifeVisualization = document.getElementById('lifeVisualization');
+            lifeVisualization.innerHTML = '';
+
+            const sectionDormir = document.createElement('div');
+            sectionDormir.classList.add('life-segment', 'dormir');
+            sectionDormir.style.flex = `${porcentajeDormido}`;
+            lifeVisualization.appendChild(sectionDormir);
+
+            const sectionTrabajo = document.createElement('div');
+            sectionTrabajo.classList.add('life-segment', 'trabajo');
+            sectionTrabajo.style.flex = `${porcentajeTrabajadoVida}`;
+            lifeVisualization.appendChild(sectionTrabajo);
+
+            if (comodinTotalYears > 0) {
+                const sectionComodin = document.createElement('div');
+                sectionComodin.classList.add('life-segment', 'comodin');
+                sectionComodin.style.flex = `${(comodinTotalYears / expectativaVida) * 100}`;
+                lifeVisualization.appendChild(sectionComodin);
+            }
+
+            const sectionLibre = document.createElement('div');
+            sectionLibre.classList.add('life-segment', 'libre');
+            sectionLibre.style.flex = `${porcentajeTiempoLibre}`;
+            lifeVisualization.appendChild(sectionLibre);
+
+            const legend = document.getElementById('legend');
+            legend.innerHTML = `
+                <div class="legend-item">
+                    <div class="legend-color dormir"></div>
+                    <span>Sueño: ${porcentajeDormido.toFixed(2)}% (${yearsSleepying.toFixed(2)} años) </span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color trabajo"></div>
+                    <span>Trabajo: ${porcentajeTrabajadoVida.toFixed(2)}% (${yearsWorking.toFixed(2)} años)</span>
+                </div>
+                ${comodinTotalYears > 0 ? `
+                <div class="legend-item">
+                    <div class="legend-color comodin"></div>
+                    <span>Estudios: ${(comodinTotalYears / expectativaVida * 100).toFixed(2)}% (${comodinTotalYears.toFixed(2)} años)</span>
+                </div>` : ''}
+                <div class="legend-item">
+                    <div class="legend-color libre"></div>
+                    <span>Tiempo libre: ${porcentajeTiempoLibre.toFixed(2)}% (${yearsOfFreeTime.toFixed(2)} años)</span>
+                </div>
+            `;
+        }
+    </script>
+
+</body>
+</html>
